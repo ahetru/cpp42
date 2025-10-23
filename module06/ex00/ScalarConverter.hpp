@@ -16,7 +16,7 @@ class ScalarConverter {
 			TYPE_FLOAT,
 			TYPE_DOUBLE,
 			TYPE_PSEUDO,
-			TYPE_UNKOWN,
+			TYPE_UNKNOWN,
 		};
 
 		static Type getType(const std::string& literal);

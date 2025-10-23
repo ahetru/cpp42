@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include "ScalarConverter.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-	printf("Hello World!\n");
+  if (argc != 2) {
+    return 0;
+  }
+  ScalarConverter::convert(std::string(argv[1]));
 	return 0;
 }
