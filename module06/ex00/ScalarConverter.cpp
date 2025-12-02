@@ -86,9 +86,8 @@ bool ScalarConverter::isFloat(const std::string &literal) {
 }
 
 bool ScalarConverter::isChar(const std::string& literal) {
-  return (literal.length() == 3 &&
-      literal[0] == 39 &&
-      literal[2] == 39);
+	bool isDigit = (literal.c_str()[0] >= '0' && literal.c_str()[0] <= '9');
+	return (literal.length() == 1 && !isDigit);
 }
 
 bool ScalarConverter::isDouble(const std::string& literal) {
@@ -117,7 +116,7 @@ bool ScalarConverter::isDouble(const std::string& literal) {
   return true;
 }
 
-static void convertFromInt(const std::string &literal)
+void convertFromInt(const std::string &literal)
 {
 	int litToInt = std::atoi(literal.c_str());
 
@@ -148,6 +147,26 @@ static void convertFromInt(const std::string &literal)
 	}
 }
 
+void convertFromChar(const std::string &literal)
+{
+	char toChar = literal.c_str()[0];
+	{
+		std::cout << "char: " << toChar << std::endl;
+	}
+	int toInt = static_cast<int>(toChar);
+	{
+		std::cout << "int: " << toInt << std::endl;
+	}
+	float toFloat = static_cast<float>(toInt);
+	{
+		std::cout << "float: " << toFloat << ".0f" << std::endl;
+	}
+	double toDouble = static_cast<double>(toInt);
+	{
+		std::cout << "double " << toDouble << ".0" << std::endl;
+	}
+}
+
 void ScalarConverter::convert(const std::string &literal) {
   if (literal.empty()) {
     std::cout << "literal given is empty\n";
@@ -158,6 +177,8 @@ void ScalarConverter::convert(const std::string &literal) {
 	{
 		case TYPE_CHAR:
 		{
+			convertFromChar(literal);
+			std::cout << "Hello from case char\n";
 		} break;
 		case TYPE_INT:
 		{
