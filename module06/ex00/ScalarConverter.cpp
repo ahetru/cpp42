@@ -1,5 +1,7 @@
 #include "ScalarConverter.hpp"
 #include <cctype>
+#include <iterator>
+#include <cstdlib>
 
 ScalarConverter::ScalarConverter() {};
 
@@ -34,9 +36,6 @@ ScalarConverter::Type ScalarConverter::getType(const std::string& literal) {
 	return TYPE_UNKNOWN;
 }
 
-// I made the choice to verify the emptyness of the string before calling getType
-// Therefore it is not verified in type checking member fuction
-
 bool ScalarConverter::isInt(const std::string& literal) {
   size_t i = 0;
 
@@ -58,7 +57,7 @@ bool ScalarConverter::isInt(const std::string& literal) {
 bool ScalarConverter::isFloat(const std::string &literal) {
   bool hasDecimalPoint= false;
   size_t i = 0;
-  
+
   char lastChar = literal[literal.length() - 1];
   if (lastChar != 'f') {
     return false;
@@ -87,13 +86,13 @@ bool ScalarConverter::isFloat(const std::string &literal) {
 }
 
 bool ScalarConverter::isChar(const std::string& literal) {
-  return (literal.length() == 3 && 
-      literal[0] == 39 && 
+  return (literal.length() == 3 &&
+      literal[0] == 39 &&
       literal[2] == 39);
 }
 
 bool ScalarConverter::isDouble(const std::string& literal) {
-  bool hasDecimalPoint= false;
+  bool hasDecimalPoint = false;
   size_t i = 0;
 
   if (literal[i] == '+' || literal[i] == '-') {
@@ -118,12 +117,62 @@ bool ScalarConverter::isDouble(const std::string& literal) {
   return true;
 }
 
+static void convertFromInt(const std::string &literal)
+{
+	int litToInt = std::atoi(literal.c_str());
+
+	{
+		char intToChar = litToInt;
+		if (litToInt >= 33 && litToInt <= 126)
+		{
+			std::cout << "char: " << intToChar << std::endl;
+		}
+		else
+		{
+			std::cout <<"char : Non displayable" << std::endl;
+		}
+	}
+
+	{
+		std::cout << "int: " << litToInt << std::endl;
+	}
+
+	{
+		float intToFloat = static_cast<float>(litToInt);
+		std::cout << "float: " << intToFloat << ".0f" << std::endl;
+	}
+
+	{
+		double intToDouble = static_cast<double>(litToInt);
+		std::cout << "double: " << intToDouble << ".0" << std::endl;
+	}
+}
+
 void ScalarConverter::convert(const std::string &literal) {
   if (literal.empty()) {
     std::cout << "literal given is empty\n";
   }
 	Type type = getType(literal);
-  (void)type;
+
+	switch(type)
+	{
+		case TYPE_CHAR:
+		{
+		} break;
+		case TYPE_INT:
+		{
+			convertFromInt(literal);
+		} break;
+		case TYPE_FLOAT:
+		{
+		} break;
+		case TYPE_DOUBLE:
+		{
+		} break;
+		case TYPE_UNKNOWN:
+		{
+		} break;
+	}
 	// switch(type) {
 	//    case TYPE_INT:
 	//      convertFromInt(literal);
