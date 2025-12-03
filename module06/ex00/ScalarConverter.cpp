@@ -2,6 +2,8 @@
 #include <cctype>
 #include <iterator>
 #include <cstdlib>
+#include <bits/stdc++.h>
+#include <sstream>
 
 ScalarConverter::ScalarConverter() {};
 
@@ -116,7 +118,7 @@ bool ScalarConverter::isDouble(const std::string& literal) {
   return true;
 }
 
-void convertFromInt(const std::string &literal)
+void ScalarConverter::convertFromInt(const std::string &literal)
 {
 	int litToInt = std::atoi(literal.c_str());
 
@@ -147,24 +149,75 @@ void convertFromInt(const std::string &literal)
 	}
 }
 
-void convertFromChar(const std::string &literal)
+void ScalarConverter::convertFromChar(const std::string &literal)
 {
 	char toChar = literal.c_str()[0];
-	{
-		std::cout << "char: " << toChar << std::endl;
-	}
+	std::cout << "char: " << toChar << std::endl;
+
 	int toInt = static_cast<int>(toChar);
-	{
-		std::cout << "int: " << toInt << std::endl;
-	}
+	std::cout << "int: " << toInt << std::endl;
+
 	float toFloat = static_cast<float>(toInt);
-	{
-		std::cout << "float: " << toFloat << ".0f" << std::endl;
-	}
+	std::cout << "float: " << toFloat << ".0f" << std::endl;
+
 	double toDouble = static_cast<double>(toInt);
-	{
-		std::cout << "double " << toDouble << ".0" << std::endl;
-	}
+	std::cout << "double " << toDouble << ".0" << std::endl;
+}
+
+
+float ScalarConverter::strToFloat(const std::string& literal) {
+    float ret = 0.0f;
+    bool inIntegerPart = true;
+    float decimalMultiplier = 0.1f;
+    bool isNegative = false;
+    size_t startIndex = 0;
+
+    if (literal[0] == '-') {
+        isNegative = true;
+        startIndex = 1;
+    } else if (literal[0] == '+') {
+        startIndex = 1;
+    }
+
+    size_t endIndex = literal.length();
+    if (literal[literal.length() - 1] == 'f' || literal[literal.length() - 1] == 'F') {
+        endIndex = literal.length() - 1;
+    }
+
+    for (size_t i = startIndex; i < endIndex; ++i)
+    {
+        if (literal[i] == '.')
+        {
+            inIntegerPart = false;
+        } else if (isdigit(literal[i]))
+        {
+            int digit = literal[i] - '0';
+
+            if (inIntegerPart) {
+                ret = ret * 10.0f + static_cast<float>(digit);
+            } else
+            {
+                ret = ret + digit * decimalMultiplier;
+                decimalMultiplier *= 0.1f;
+            }
+        }
+    }
+
+    if (isNegative)
+    {
+        ret = -ret;
+    }
+
+    return ret;
+}
+
+void ScalarConverter::convertFromFloat(const std::string &literal)
+{
+	float toFloat = strToFloat(literal);
+	std::cout << "strToFloat result: " << toFloat << std::endl;
+	//std::cout << "char: Non displayable\n";
+
+//	int toInt = static_cast<int>();
 }
 
 void ScalarConverter::convert(const std::string &literal) {
@@ -186,6 +239,7 @@ void ScalarConverter::convert(const std::string &literal) {
 		} break;
 		case TYPE_FLOAT:
 		{
+			convertFromFloat(literal);
 		} break;
 		case TYPE_DOUBLE:
 		{
