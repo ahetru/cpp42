@@ -25,11 +25,12 @@ class ScalarConverter {
 		static bool isChar(const std::string& literal);
 
 		static float strToFloat(const std::string& literal);
+		static double strToDouble(const std::string& literal);
 
 		static void convertFromInt(const std::string &literal);
 		static void convertFromChar(const std::string &literal);
 		static void convertFromFloat(const std::string &literal);
-
+		static void convertFromDouble(const std::string &literal);
 
 	public:
 		static void convert(const std::string& literal);

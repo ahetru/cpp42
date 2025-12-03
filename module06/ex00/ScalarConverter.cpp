@@ -39,6 +39,7 @@ ScalarConverter::Type ScalarConverter::getType(const std::string& literal) {
 }
 
 bool ScalarConverter::isInt(const std::string& literal) {
+
   size_t i = 0;
 
   if (literal[i] == '+' || literal[i] == '-') {
@@ -57,6 +58,11 @@ bool ScalarConverter::isInt(const std::string& literal) {
 }
 
 bool ScalarConverter::isFloat(const std::string &literal) {
+
+  if (literal == "-inff" || literal == "+inff" || literal == "nanf")
+  {
+  	return true;
+  }
   bool hasDecimalPoint= false;
   size_t i = 0;
 
@@ -118,54 +124,12 @@ bool ScalarConverter::isDouble(const std::string& literal) {
   return true;
 }
 
-void ScalarConverter::convertFromInt(const std::string &literal)
+
+
+
+
+float ScalarConverter::strToFloat(const std::string& literal)
 {
-	int litToInt = std::atoi(literal.c_str());
-
-	{
-		char intToChar = litToInt;
-		if (litToInt >= 33 && litToInt <= 126)
-		{
-			std::cout << "char: " << intToChar << std::endl;
-		}
-		else
-		{
-			std::cout <<"char : Non displayable" << std::endl;
-		}
-	}
-
-	{
-		std::cout << "int: " << litToInt << std::endl;
-	}
-
-	{
-		float intToFloat = static_cast<float>(litToInt);
-		std::cout << "float: " << intToFloat << ".0f" << std::endl;
-	}
-
-	{
-		double intToDouble = static_cast<double>(litToInt);
-		std::cout << "double: " << intToDouble << ".0" << std::endl;
-	}
-}
-
-void ScalarConverter::convertFromChar(const std::string &literal)
-{
-	char toChar = literal.c_str()[0];
-	std::cout << "char: " << toChar << std::endl;
-
-	int toInt = static_cast<int>(toChar);
-	std::cout << "int: " << toInt << std::endl;
-
-	float toFloat = static_cast<float>(toInt);
-	std::cout << "float: " << toFloat << ".0f" << std::endl;
-
-	double toDouble = static_cast<double>(toInt);
-	std::cout << "double " << toDouble << ".0" << std::endl;
-}
-
-
-float ScalarConverter::strToFloat(const std::string& literal) {
     float ret = 0.0f;
     bool inIntegerPart = true;
     float decimalMultiplier = 0.1f;
@@ -211,13 +175,138 @@ float ScalarConverter::strToFloat(const std::string& literal) {
     return ret;
 }
 
+double ScalarConverter::strToDouble(const std::string& literal)
+{
+    double ret = 0.0f;
+    bool inIntegerPart = true;
+    double decimalMultiplier = 0.1f;
+    bool isNegative = false;
+    size_t startIndex = 0;
+
+    if (literal[0] == '-') {
+        isNegative = true;
+        startIndex = 1;
+    } else if (literal[0] == '+') {
+        startIndex = 1;
+    }
+
+    size_t endIndex = literal.length();
+    for (size_t i = startIndex; i < endIndex; ++i)
+    {
+        if (literal[i] == '.')
+        {
+            inIntegerPart = false;
+        } else if (isdigit(literal[i]))
+        {
+            int digit = literal[i] - '0';
+
+            if (inIntegerPart) {
+                ret = ret * 10.0f + static_cast<double>(digit);
+            } else
+            {
+                ret = ret + digit * decimalMultiplier;
+                decimalMultiplier *= 0.1f;
+            }
+        }
+    }
+
+    if (isNegative)
+    {
+        ret = -ret;
+    }
+
+    return ret;
+}
+
+void ScalarConverter::convertFromInt(const std::string &literal)
+{
+	int toInt = std::atoi(literal.c_str());
+
+	char intToChar = toInt;
+	if (toInt >= 33 && toInt <= 126)
+	{
+		std::cout << "char: " << intToChar << std::endl;
+	} else
+	{
+		std::cout <<"char : Non displayable" << std::endl;
+	}
+
+	std::cout << "int: " << toInt << std::endl;
+
+	float intToFloat = static_cast<float>(toInt);
+	std::cout << "float: " << intToFloat << ".0f" << std::endl;
+
+	double intToDouble = static_cast<double>(toInt);
+	std::cout << "double: " << intToDouble << ".0" << std::endl;
+}
+
 void ScalarConverter::convertFromFloat(const std::string &literal)
 {
-	float toFloat = strToFloat(literal);
-	std::cout << "strToFloat result: " << toFloat << std::endl;
-	//std::cout << "char: Non displayable\n";
+	float toFloat;
+	if (literal == "-inff")
+	{
+        toFloat = -std::numeric_limits<float>::infinity();
+    } else if (literal == "+inff")
+	{
+        toFloat = std::numeric_limits<float>::infinity();
+    } else if (literal == "nanf")
+	{
+        toFloat = std::numeric_limits<float>::quiet_NaN();
+    } else
+	{
+    	toFloat = strToFloat(literal);
+    }
+	std::cout << "char: Non displayable\n";
 
-//	int toInt = static_cast<int>();
+	int toInt = static_cast<int>(toFloat);
+	std::cout << "int: " << toInt << std::endl;
+
+	std::cout << "float: " << toFloat << "f" << std::endl;
+
+	double toDouble = static_cast<double>(toFloat);
+	std::cout << "double: " << toDouble << std::endl;
+}
+
+void ScalarConverter::convertFromDouble(const std::string& literal)
+{
+	double toDouble = strToDouble(literal);
+
+	bool isPseudo = (literal == "+inf" ||
+					literal == "-inf" ||
+					literal == "nan");
+
+	(void)isPseudo;
+	char toChar = static_cast<char>(toDouble);
+	if (std::isprint(toChar))
+	{
+		std::cout << "char: " << toChar << std::endl;
+	} else
+	{
+		std::cout << "char: Non displayable\n";
+	}
+
+	int toInt = static_cast<int>(toDouble);
+	std::cout << "int: " << toInt << std::endl;
+
+	float toFloat = static_cast<float>(toDouble);
+	std::cout << "float: " << toFloat << "f" << std::endl;
+
+	std::cout << "double: " << toDouble << std::endl;
+}
+
+void ScalarConverter::convertFromChar(const std::string &literal)
+{
+	char toChar = literal.c_str()[0];
+	std::cout << "char: " << toChar << std::endl;
+
+	int toInt = static_cast<int>(toChar);
+	std::cout << "int: " << toInt << std::endl;
+
+	float toFloat = static_cast<float>(toInt);
+	std::cout << "float: " << toFloat << ".0f" << std::endl;
+
+	double toDouble = static_cast<double>(toInt);
+	std::cout << "double " << toDouble << ".0" << std::endl;
 }
 
 void ScalarConverter::convert(const std::string &literal) {
@@ -243,9 +332,11 @@ void ScalarConverter::convert(const std::string &literal) {
 		} break;
 		case TYPE_DOUBLE:
 		{
+			convertFromDouble(literal);
 		} break;
 		case TYPE_UNKNOWN:
 		{
+			std::cout << "Unexptected type\n";
 		} break;
 	}
 	// switch(type) {
