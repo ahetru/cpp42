@@ -1,4 +1,4 @@
-NAME = scalar
+NAME = convert
 CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98 -MMD
 SRC = main.cpp ScalarConverter.cpp
