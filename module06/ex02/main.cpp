@@ -11,13 +11,13 @@
 int main(void)
 {
 	 std::srand(std::time(NULL));
-	Base* a = generate();
-	identify(a);
+	Base* ptr = generate();
+	identify(ptr);
 
-	Base &ref = *a;
+	Base &ref = *ptr;
 	identify(ref);
 
-	delete a;
+	delete ptr;
 
 	return 0;
 }
