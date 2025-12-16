@@ -13,24 +13,17 @@ Base* generate(void)
 	switch(random)
 	{
 		case (0):
-		{
-			base = new A();
-		} break;
+			base = new A(); break;
 		case (1):
-		{
-			base = new B();
-		} break;
+			base = new B(); break;
 		case (2):
-		{
-			base = new C();
-		} break;
+			base = new C(); break;
 	}
 	return base;
 }
 
 void identify(Base* p)
 {
-	std::cout << "From identify *\n";
 	A* a = dynamic_cast<A*>(p);
 	if (a)
 	{
@@ -61,7 +54,7 @@ void identify(Base& p)
 		std::cout << "Base is type A\n";
 	}
 	catch(...)
-	{}
+	{std::cout << "Is not type A\n";}
 	try
 	{
 		B& b = dynamic_cast<B&>(p);
@@ -69,7 +62,7 @@ void identify(Base& p)
 		(void)b;
 	}
 	catch(...)
-	{}
+	{std::cout << "Is not type B\n";}
 	try
 	{
 		C& c = dynamic_cast<C&>(p);
@@ -77,5 +70,5 @@ void identify(Base& p)
 		(void)c;
 	}
 	catch(...)
-	{}
+	{std::cout << "Is not type C\n";}
 }

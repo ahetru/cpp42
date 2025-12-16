@@ -7,7 +7,7 @@
 class A : public Base {
 	public:
 		A() { std::cout << "A default constructor\n"; };
-		~A() { std::cout << "A default destructor\n"; };
+		~A() { std::cout << "A destructor\n"; };
 };
 
 #endif
