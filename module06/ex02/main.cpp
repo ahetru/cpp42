@@ -10,7 +10,7 @@
 
 int main(void)
 {
-	 std::srand(std::time(NULL));
+	std::srand(std::time(NULL));
 	Base* ptr = generate();
 	identify(ptr);
 

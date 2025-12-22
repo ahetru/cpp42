@@ -91,7 +91,15 @@ bool ScalarConverter::isDouble(const std::string& literal)
 ScalarConverter::Type ScalarConverter::getType(const std::string& literal)
 {
 	if (isChar(literal)) return TYPE_CHAR;
-	if (isInt(literal)) return TYPE_INT;
+	if (isInt(literal))
+	{
+		long v = std::strtol(literal.c_str(), NULL, 10);
+				if (v >= std::numeric_limits<int>::min() &&
+				    v <= std::numeric_limits<int>::max())
+					return TYPE_INT;
+				else
+					return TYPE_DOUBLE;
+	}
 	if (isFloat(literal)) return TYPE_FLOAT;
 	if (isDouble(literal)) return TYPE_DOUBLE;
 	return TYPE_UNKNOWN;
@@ -110,7 +118,13 @@ void ScalarConverter::convertFromInt(const std::string &literal)
 	else
 		std::cout << "char: '" << static_cast<char>(val) << "'\n";
 
-	std::cout << "int: " << val << "\n";
+	if (val < std::numeric_limits<int>::min() ||
+		val > std::numeric_limits<int>::max()) {
+			std::cout << "int: impossible\n";
+		} else {
+			int intVal = static_cast<int>(val);
+			std::cout << "int: " << intVal << "\n";
+		}
 
 	std::cout << "float: " << static_cast<float>(val) << ".0f\n";
 
