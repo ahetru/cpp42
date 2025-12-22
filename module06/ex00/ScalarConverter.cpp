@@ -29,6 +29,12 @@ bool ScalarConverter::isInt(const std::string& literal)
 	for (; i < literal.length(); i++)
 		if (!std::isdigit(literal[i]))
 			return false;
+	long val = std::strtol(literal.c_str(), NULL, 10);
+    if (val < std::numeric_limits<int>::min() ||
+    	val > std::numeric_limits<int>::max())
+    {
+    	return false;
+    }
 
 	return true;
 }
@@ -91,15 +97,7 @@ bool ScalarConverter::isDouble(const std::string& literal)
 ScalarConverter::Type ScalarConverter::getType(const std::string& literal)
 {
 	if (isChar(literal)) return TYPE_CHAR;
-	if (isInt(literal))
-	{
-		long v = std::strtol(literal.c_str(), NULL, 10);
-				if (v >= std::numeric_limits<int>::min() &&
-				    v <= std::numeric_limits<int>::max())
-					return TYPE_INT;
-				else
-					return TYPE_DOUBLE;
-	}
+	if (isInt(literal)) return TYPE_INT;
 	if (isFloat(literal)) return TYPE_FLOAT;
 	if (isDouble(literal)) return TYPE_DOUBLE;
 	return TYPE_UNKNOWN;
