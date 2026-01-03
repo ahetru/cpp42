@@ -2,7 +2,7 @@ NAME = templates
 CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98 -MMD
 ASMFLAGS = -S -fverbose-asm -std=c++98
-SRC = main.cpp Array.cpp
+SRC = main.cpp 
 OBJ = $(SRC:.cpp=.o)
 DEP = $(OBJ:.o=.d)
 
