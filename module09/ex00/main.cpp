@@ -1,37 +1,23 @@
-#include <iostream>
-#include <fstream>
 #include "BitcoinExchange.hpp"
+#include <iostream>
 
-int main(int ac, char **av)
+int main(int argc, char **argv)
 {
-	if (ac != 2)
+	if (argc != 2)
 	{
-		std::cerr << "Invalid arguments\n";
-		std::cerr << "Usage: <" << av[0] << " input.txt>\n";
+		std::cerr << "Error: could not open file." << std::endl;
 		return 1;
 	}
-
-	std::ifstream referenceDB("data.csv");
-	if (!referenceDB.is_open())
-	{
-		std::cerr << "Could not open reference database file\n";
-		return -1;
-	}
-	std::ifstream inputData(av[1]);
-	if (!inputData.is_open())
-	{
-		std::cerr << "Could not open input file\n";
-		referenceDB.close();
-		return -1;
-	}
-
 	try
 	{
-		BitcoinExchange btc(referenceDB);
-		btc.evaluate(inputData);
-	} catch(std::exception& e)
+		std::string dbFilename("data.csv");
+		BitcoinExchange btc(dbFilename);
+		btc.processInput(argv[1]);
+	}
+	catch (const std::exception &e)
 	{
-		std::cerr << "Error" << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
+		return 1;
 	}
 	return 0;
 }

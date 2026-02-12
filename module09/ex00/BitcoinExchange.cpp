@@ -1,76 +1,125 @@
 #include "BitcoinExchange.hpp"
+#include <fstream>
 #include <sstream>
 #include <iostream>
-#include <vector>
-#include <string>
 #include <cstdlib>
-#include <limits>
 
-BitcoinExchange::BitcoinExchange(std::ifstream& db)
+BitcoinExchange::BitcoinExchange() {}
+BitcoinExchange::~BitcoinExchange() {}
+
+BitcoinExchange::BitcoinExchange(const std::string& filename)
 {
-	loadDatabase(db);
+	loadDatabase(filename);
 }
 
-BitcoinExchange::~BitcoinExchange() {};
-
-BitcoinExchange::BitcoinExchange(const BitcoinExchange& btc)
+void BitcoinExchange::loadDatabase(const std::string &filename)
 {
-	(void)btc;
-	throw std::runtime_error("btc copy is not allowed\n");
-};
+	std::ifstream file(filename.c_str());
+	if (!file)
+		throw std::runtime_error("Error: could not open database.");
 
-BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& btc)
-{
-	(void)btc;
-	std::cerr << "btc assignement is not allowed\n";
-	return *this;
-}
-
-void BitcoinExchange::loadDatabase(std::ifstream& db)
-{
-	if (!db)
-		throw std::runtime_error("Could not open database");
 	std::string line;
-	while (std::getline(db, line))
+	std::getline(file, line);
+
+	while (std::getline(file, line))
 	{
-		size_t delim = line.find(',');
-		if (delim == std::string::npos)
-			throw std::runtime_error("Error: bad database format");
+		std::stringstream ss(line);
+		std::string date;
+		std::string value;
 
-		std::string date = line.substr(0, delim);
-		std::string BtcScalarStr = line.substr(delim + 1);
+		if (!std::getline(ss, date, ',') || !std::getline(ss, value))
+			continue;
 
-		double btcScalar = std::atof(valueStr.c_str());
-		_referenceDB.insert(make_pair(date, btcScalar));
+		_referenceDB[date] = std::atof(value.c_str());
 	}
 }
 
-void BitcoinExchange::evaluate(std::ifstream& inputData)
+bool BitcoinExchange::isValidDate(const std::string &date) const
 {
-	std::string line;
-	//process header
-	std::getline(inputData, line);
-	if (line != "date | value")
-	{
-		std::cerr << "Invalid format" << std::endl;
-		return ;
-	}
-	while (std::getline(inputData, line))
-	{
-		std::cout << line << std::endl;
-		size_t delim = line.find(" | ");
-		if (delim == std::string::npos)
-			std::cerr "Error: bad input =>" << line;
+	if (date.length() != 10 || date[4] != '-' || date[7] != '-')
+		return false;
 
-		std::string date = line.substr(0, delim);
-		std::string btcStr = line.substr(delim + 1);
+	int y = std::atoi(date.substr(0, 4).c_str());
+	int m = std::atoi(date.substr(5, 2).c_str());
+	int d = std::atoi(date.substr(8, 2).c_str());
 
-		
-		long float btcValue = std::atof(bctStr.c_str());
-		if (btcValue < 0)
-			std::cerr << "Error: not a positive number" << std::endl;
-		if (btcValue > 1000)
-			std::cer << "Error: btc value superior to 1000" << std::endl;
-	}
+	if (y < 2009 || m < 1 || m > 12 || d < 1 || d > 31)
+		return false;
 
+	return true;
 }
+
+bool BitcoinExchange::isValidValue(const std::string &value, double &out) const
+{
+	char *end;
+	out = std::strtod(value.c_str(), &end);
+
+	if (*end != '\0')
+		return false;
+	if (out < 0)
+		throw std::runtime_error("Error: not a positive number.");
+	if (out > 1000)
+		throw std::runtime_error("Error: too large a number.");
+
+	return true;
+}
+
+void BitcoinExchange::processInput(const std::string &filename) const
+{
+	std::ifstream file(filename.c_str());
+	if (!file)
+		throw std::runtime_error("Error: could not open file.");
+
+	std::string line;
+	std::getline(file, line);
+
+	while (std::getline(file, line))
+	{
+		std::stringstream ss(line);
+		std::string date;
+		std::string valueStr;
+
+		if (!std::getline(ss, date, '|') || !std::getline(ss, valueStr))
+		{
+			std::cout << "Error: bad input => " << line << std::endl;
+			continue;
+		}
+
+		date.erase(date.find_last_not_of(" \t") + 1);
+		valueStr.erase(0, valueStr.find_first_not_of(" \t"));
+
+		if (!isValidDate(date))
+		{
+			std::cout << "Error: bad input => " << date << std::endl;
+			continue;
+		}
+
+		double value;
+		try
+		{
+			if (!isValidValue(valueStr, value))
+				throw std::runtime_error("Error: bad input => " + date);
+		}
+		catch (const std::exception &e)
+		{
+			std::cout << e.what() << std::endl;
+			continue;
+		}
+
+		std::map<std::string, double>::const_iterator it = _referenceDB.lower_bound(date);
+
+		if (it == _referenceDB.end() || it->first != date)
+		{
+			if (it == _referenceDB.begin())
+			{
+				std::cout << "Error: no rate available." << std::endl;
+				continue;
+			}
+			--it;
+		}
+
+		std::cout << date << " => " << value
+				  << " = " << value * it->second << std::endl;
+	}
+}
+

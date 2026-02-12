@@ -7,13 +7,16 @@ class BitcoinExchange
 {
 	private:
 		std::map<std::string, double> _referenceDB;
-		BitcoinExchange();
-		void loadDatabase(std::ifstream& db);
+		void loadDatabase(const std::string &filename);
+		bool isValidValue(const std::string &value, double &out) const;
+		bool isValidDate(const std::string &date) const;
 
 	public:
-		BitcoinExchange(std::ifstream& db);
+		BitcoinExchange(const std::string &dbFilename);
+		BitcoinExchange();
 		~BitcoinExchange();
 		BitcoinExchange(const BitcoinExchange& other);
 		BitcoinExchange& operator=(const BitcoinExchange& other);
-		void evaluate(std::ifstream& data);
+
+		void processInput(const std::string& filename) const;
 };
