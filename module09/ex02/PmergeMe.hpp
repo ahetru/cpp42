@@ -1,20 +1,30 @@
-#pragma once
+#ifndef PMERGEME_HPP
+#define PMERGEME_HPP
+
 #include <vector>
+#include <deque>
 #include <string>
 
 class PmergeMe
 {
-	private:
-		std::vector<int> _data;
-		PmergeMe(const PmergeMe& other);
-		PmergeMe& operator=(const PmergeMe& other);
-		void loadData(char **cleanARGV);
+private:
+    std::vector<int> _vector;
+    std::deque<int>  _deque;
 
-	public:
-		PmergeMe();
-		PmergeMe(char **cleanARGV);
-		~PmergeMe();
-		void sort();
+    void parseInput(char **args, int size);
 
-		friend std::ostream& operator<<(std::ostream& os, const PmergeMe& p);
+    void sortVector();
+    void sortDeque();
+
+    void fordJohnsonVector(std::vector<int>& vec);
+    void fordJohnsonDeque(std::deque<int>& deq);
+
+public:
+    PmergeMe();
+    ~PmergeMe();
+
+    void process(char **args, int size);
 };
+
+#endif
+

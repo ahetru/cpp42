@@ -1,22 +1,25 @@
-#include <iostream>
 #include "PmergeMe.hpp"
+#include <iostream>
 
-int main(int ac, char **av)
-
+int main(int argc, char **argv)
 {
-	if (ac == 1)
-	{
-		std::cout << "No parameters given\n";
-		return 1;
-	}
-	try
-	{
-		PmergeMe merge(av + 1);
-		std::cout << merge << std::endl;
-	}
-	catch(std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
-	return 0;
+    if (argc < 2)
+    {
+        std::cerr << "Error" << std::endl;
+        return 1;
+    }
+
+    try
+    {
+        PmergeMe sorter;
+        sorter.process(argv + 1, argc - 1);
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "Error" << std::endl;
+        return 1;
+    }
+
+    return 0;
 }
+
